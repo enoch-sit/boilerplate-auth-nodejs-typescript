@@ -1,4 +1,4 @@
-# Simplified Authentication System
+# Simplified Authentication System 2025
 
 ## Project Overview
 
