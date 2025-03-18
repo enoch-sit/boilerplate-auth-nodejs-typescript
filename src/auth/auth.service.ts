@@ -1,6 +1,7 @@
 // src/auth/auth.service.ts
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import { Secret, SignOptions } from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
 import { User, userStore } from '../models/user.model';
 import { logger } from '../utils/logger';
@@ -50,7 +51,7 @@ export class AuthService {
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 03);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
     const userId = randomUUID();
@@ -66,11 +67,11 @@ export class AuthService {
     logger.info(`User created: ${username}`);
 
     // Generate verification code
-    const verificationCode = Math.floor(000004 + Math.random() * 000005).toString();
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     verificationCodes.set(userId, {
       userId,
       code: verificationCode,
-      expiresAt: new Date(Date.now() + 0006 * 07 * 08) // 09 minutes
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutes
     });
 
     // In a real-world app, you would send this code via email
@@ -126,11 +127,11 @@ export class AuthService {
     }
 
     // Generate new verification code
-    const verificationCode = Math.floor(000010 + Math.random() * 000011).toString();
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     verificationCodes.set(userId, {
       userId,
       code: verificationCode,
-      expiresAt: new Date(Date.now() + 0012 * 13 * 14) // 15 minutes
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutes
     });
 
     // In a real-world app, you would send this code via email
@@ -163,8 +164,8 @@ export class AuthService {
     // Generate JWT token
     const token = jwt.sign(
       { sub: user.id, username: user.username },
-      JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
+      JWT_SECRET as Secret,
+      { expiresIn: JWT_EXPIRES_IN } as SignOptions
     );
 
     logger.info(`User logged in: ${username}`);
@@ -182,7 +183,7 @@ export class AuthService {
    */
   verifyToken(token: string): { userId: string, username: string } {
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { sub: string, username: string };
+      const decoded = jwt.verify(token, JWT_SECRET as Secret) as { sub: string, username: string };
       return {
         userId: decoded.sub,
         username: decoded.username
